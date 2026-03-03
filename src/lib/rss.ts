@@ -45,6 +45,45 @@ function extractImageFromContent(content: string): string | undefined {
   return match?.[1];
 }
 
+const CONFLICT_KEYWORDS = [
+  // War & military
+  "war", "conflict", "military", "army", "troops", "soldier", "strike",
+  "airstrike", "air strike", "bombing", "bomb", "missile", "rocket",
+  "attack", "offensive", "invasion", "ceasefire", "cease-fire",
+  "frontline", "battlefield", "combat", "weapon", "artillery",
+  "drone", "navy", "warship", "aircraft carrier", "fighter jet",
+  // Geopolitical actors
+  "iran", "israel", "gaza", "hamas", "hezbollah", "houthi",
+  "idf", "irgc", "pentagon", "netanyahu", "khamenei",
+  "palestine", "palestinian", "west bank", "golan", "lebanon",
+  "syria", "yemen", "iraq", "tehran", "tel aviv", "jerusalem",
+  // Diplomacy & sanctions
+  "sanction", "diplomacy", "diplomatic", "negotiation", "treaty",
+  "un security council", "resolution", "embargo", "nuclear",
+  "enrichment", "uranium",
+  // Humanitarian
+  "casualty", "casualties", "civilian", "refugee", "displaced",
+  "humanitarian", "aid", "evacuation", "shelter", "siege",
+  "blockade", "famine", "crisis",
+  // Security & intelligence
+  "intelligence", "espionage", "assassination", "militia",
+  "insurgent", "terrorism", "terrorist", "security",
+  "defense", "defence", "escalation", "retaliation", "deterrence",
+  // UAE-specific conflict relevance
+  "uae airspace", "abu dhabi defense", "dubai security",
+  "gulf security", "gcc", "strait of hormuz", "persian gulf",
+];
+
+const CONFLICT_PATTERN = new RegExp(
+  CONFLICT_KEYWORDS.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"),
+  "i"
+);
+
+function isConflictRelated(article: Article): boolean {
+  const text = `${article.title} ${article.summary}`.toLowerCase();
+  return CONFLICT_PATTERN.test(text);
+}
+
 export async function fetchAllFeeds(): Promise<Article[]> {
   const cacheKey = "all-feeds";
   const cached = getCache<Article[]>(cacheKey);
@@ -69,12 +108,15 @@ export async function fetchAllFeeds(): Promise<Article[]> {
     }
   }
 
+  // Filter to conflict-related articles only
+  const relevant = articles.filter(isConflictRelated);
+
   // Sort: Tier 1 first, then by date descending
-  articles.sort((a, b) => {
+  relevant.sort((a, b) => {
     if (a.source.tier !== b.source.tier) return a.source.tier - b.source.tier;
     return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
   });
 
-  setCache(cacheKey, articles);
-  return articles;
+  setCache(cacheKey, relevant);
+  return relevant;
 }

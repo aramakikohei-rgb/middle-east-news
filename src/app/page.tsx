@@ -17,9 +17,14 @@ export default function Home() {
   const [translating, setTranslating] = useState<Set<string>>(new Set());
   const [visibleCount, setVisibleCount] = useState(ARTICLES_PER_PAGE);
   const [fetchedAt, setFetchedAt] = useState("");
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const translationCache = useRef<
     Map<string, { titleJa: string; summaryJa: string }>
   >(new Map());
+
+  const handleDismiss = useCallback((id: string) => {
+    setDismissed((prev) => new Set(prev).add(id));
+  }, []);
 
   const fetchArticles = useCallback(async () => {
     try {
@@ -99,8 +104,9 @@ export default function Home() {
     translateBatch();
   }, [language, articles.length, visibleCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const visibleArticles = articles.slice(0, visibleCount);
-  const hasMore = visibleCount < articles.length;
+  const activeArticles = articles.filter((a) => !dismissed.has(a.id));
+  const visibleArticles = activeArticles.slice(0, visibleCount);
+  const hasMore = visibleCount < activeArticles.length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -152,6 +158,7 @@ export default function Home() {
                 language={language}
                 isTranslating={translating.has(article.id)}
                 featured={article.source.tier === 1 && i < 5}
+                onDismiss={handleDismiss}
               />
             ))}
           </div>
