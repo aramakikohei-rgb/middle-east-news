@@ -104,16 +104,6 @@ export const FEED_SOURCES: FeedSource[] = [
     tierLabel: "Israel / Palestine",
     color: "#C9B9A8",
   },
-
-  // Tier 5 — Multilateral
-  {
-    id: "un-news",
-    name: "UN News",
-    url: "https://news.un.org/feed/subscribe/en/news/region/middle-east/feed/rss.xml",
-    tier: 5,
-    tierLabel: "Multilateral",
-    color: "#A0927B",
-  },
 ];
 
 export const TIER_LABELS: Record<number, string> = {
@@ -121,5 +111,4 @@ export const TIER_LABELS: Record<number, string> = {
   2: "Regional",
   3: "International",
   4: "Israel / Palestine",
-  5: "Multilateral",
 };

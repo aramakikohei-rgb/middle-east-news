@@ -14,7 +14,6 @@ const filters: { value: FilterTier; label: string }[] = [
   { value: 2, label: TIER_LABELS[2] },
   { value: 3, label: TIER_LABELS[3] },
   { value: 4, label: TIER_LABELS[4] },
-  { value: 5, label: TIER_LABELS[5] },
 ];
 
 export default function FeedFilter({ active, onChange }: Props) {

@@ -1,11 +1,10 @@
-export type Tier = 1 | 2 | 3 | 4 | 5;
+export type Tier = 1 | 2 | 3 | 4;
 
 export type TierLabel =
   | "UAE / Gulf"
   | "Regional"
   | "International"
-  | "Israel / Palestine"
-  | "Multilateral";
+  | "Israel / Palestine";
 
 export interface FeedSource {
   id: string;

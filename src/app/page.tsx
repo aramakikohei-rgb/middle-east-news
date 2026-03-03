@@ -195,7 +195,6 @@ export default function Home() {
               "NPR",
               "Haaretz",
               "Times of Israel",
-              "UN News",
             ].map((name) => (
               <span
                 key={name}
