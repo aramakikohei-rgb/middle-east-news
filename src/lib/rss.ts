@@ -61,6 +61,25 @@ function pickLargestMedia(mediaArray: any[]): string | undefined {
   return bestUrl;
 }
 
+// Parse srcset from <img> tags and return the URL with the largest width descriptor
+function pickLargestSrcsetImage(html: string): string | undefined {
+  const srcsetMatch = html.match(/<img[^>]+srcset=["']([^"']+)["']/i);
+  if (!srcsetMatch) return undefined;
+  let bestUrl: string | undefined;
+  let bestWidth = 0;
+  for (const entry of srcsetMatch[1].split(",")) {
+    const parts = entry.trim().split(/\s+/);
+    const url = parts[0];
+    const descriptor = parts[1] || "";
+    const w = parseInt(descriptor, 10) || 0;
+    if (url && w >= bestWidth) {
+      bestWidth = w;
+      bestUrl = url;
+    }
+  }
+  return bestUrl;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractImageUrl(item: any): string | undefined {
   // 1. enclosure (France 24)
@@ -79,9 +98,15 @@ function extractImageUrl(item: any): string | undefined {
   }
 
   // 4. <img> tag in content (Times of Israel, Gulf News)
+  // Prefer the largest image from srcset if available, otherwise pick the last
+  // (often highest-res) <img> src in the content.
   const content = item.content || item["content:encoded"] || "";
-  const match = content.match(/<img[^>]+src=["']([^"']+)["']/);
-  return match?.[1];
+  const srcsetImg = pickLargestSrcsetImage(content);
+  if (srcsetImg) return srcsetImg;
+
+  // Collect all <img> src values and pick the last one (often the main image)
+  const imgMatches = [...content.matchAll(/<img[^>]+src=["']([^"']+)["']/g)];
+  if (imgMatches.length) return imgMatches[imgMatches.length - 1][1];
 }
 
 const CONFLICT_KEYWORDS = [
@@ -257,11 +282,11 @@ const FALLBACK_PHOTOS = [
 function getNextFallbackImage(index: number, usedImages: Set<string>): string {
   for (let i = 0; i < FALLBACK_PHOTOS.length; i++) {
     const photoIndex = (index + i) % FALLBACK_PHOTOS.length;
-    const url = `https://images.unsplash.com/${FALLBACK_PHOTOS[photoIndex]}?w=800&h=500&fit=crop&auto=format&q=80`;
+    const url = `https://images.unsplash.com/${FALLBACK_PHOTOS[photoIndex]}?w=1600&h=1000&fit=crop&auto=format&q=80`;
     if (!usedImages.has(url)) return url;
   }
   // All photos used — append unique suffix to avoid Set collision
-  return `https://images.unsplash.com/${FALLBACK_PHOTOS[index % FALLBACK_PHOTOS.length]}?w=800&h=500&fit=crop&auto=format&q=80&v=${index}`;
+  return `https://images.unsplash.com/${FALLBACK_PHOTOS[index % FALLBACK_PHOTOS.length]}?w=1600&h=1000&fit=crop&auto=format&q=80&v=${index}`;
 }
 
 async function scrapeOgImage(url: string): Promise<string | undefined> {
