@@ -177,7 +177,9 @@ function isJunkImage(url: string): boolean {
     lower.includes("gstatic.com") ||
     lower.includes("/logos/") ||
     // Google News thumbnail (low-quality, often just the publisher logo)
-    lower.includes("news.google.com")
+    lower.includes("news.google.com") ||
+    // Google user content (generic aggregator thumbnails)
+    lower.includes("googleusercontent.com")
   );
 }
 
