@@ -80,21 +80,33 @@ function pickLargestSrcsetImage(html: string): string | undefined {
   return bestUrl;
 }
 
+// Upgrade known CDN URLs to high-resolution variants
+function upgradeImageUrl(url: string): string {
+  // Haaretz CDN: replace tiny width/height params with high-res values
+  if (url.includes("img.haarets.co.il")) {
+    const u = new URL(url);
+    u.searchParams.delete("height");
+    u.searchParams.set("width", "1200");
+    return u.toString();
+  }
+  return url;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractImageUrl(item: any): string | undefined {
-  // 1. enclosure (France 24)
-  if (item.enclosure?.url) return item.enclosure.url;
+  // 1. enclosure (France 24, Haaretz)
+  if (item.enclosure?.url) return upgradeImageUrl(item.enclosure.url);
 
   // 2. media:content — pick largest resolution (Guardian, NYT, Gulf News)
   if (item.mediaContent?.length) {
     const url = pickLargestMedia(item.mediaContent);
-    if (url) return url;
+    if (url) return upgradeImageUrl(url);
   }
 
   // 3. media:thumbnail — pick largest resolution (BBC, France 24, Gulf News)
   if (item.mediaThumbnail?.length) {
     const url = pickLargestMedia(item.mediaThumbnail);
-    if (url) return url;
+    if (url) return upgradeImageUrl(url);
   }
 
   // 4. <img> tag in content (Times of Israel, Gulf News)
