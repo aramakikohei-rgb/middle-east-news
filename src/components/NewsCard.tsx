@@ -45,15 +45,15 @@ export default function NewsCard({
           href={article.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="block h-full"
+          className="flex flex-col h-full"
         >
-          {/* Image */}
-          <div className="relative w-full overflow-hidden" style={{ height: "280px" }}>
+          {/* Image — fills available space */}
+          <div className="relative w-full overflow-hidden flex-1 min-h-[200px]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={article.imageUrl}
               alt=""
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
@@ -63,7 +63,7 @@ export default function NewsCard({
           </div>
 
           {/* Content */}
-          <div className="p-6">
+          <div className="p-6 shrink-0">
             <div className="flex items-center gap-2 mb-3">
               <span
                 className="inline-block h-1.5 w-1.5 rounded-full"
@@ -111,9 +111,9 @@ export default function NewsCard({
         href={article.link}
         target="_blank"
         rel="noopener noreferrer"
-        className="block h-full"
+        className="flex flex-col h-full"
       >
-        <div className="relative w-full overflow-hidden" style={{ height: "160px" }}>
+        <div className="relative w-full overflow-hidden shrink-0" style={{ height: "160px" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={article.imageUrl}
@@ -124,7 +124,7 @@ export default function NewsCard({
           <div className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent" />
         </div>
 
-        <div className="p-4">
+        <div className="p-4 flex-1 flex flex-col">
           <div className="flex items-center gap-2 mb-2">
             <span
               className="inline-block h-1.5 w-1.5 rounded-full"
