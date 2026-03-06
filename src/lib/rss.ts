@@ -8,6 +8,12 @@ const parser = new Parser({
   headers: {
     "User-Agent": "MiddleEastNewsAggregator/1.0",
   },
+  customFields: {
+    item: [
+      ["media:content", "mediaContent", { keepArray: true }],
+      ["media:thumbnail", "mediaThumbnail", { keepArray: true }],
+    ],
+  },
 });
 
 function stripHtml(html: string): string {
@@ -30,9 +36,7 @@ async function fetchFeed(source: FeedSource): Promise<Article[]> {
       link: item.link || "",
       pubDate: item.isoDate || item.pubDate || new Date().toISOString(),
       source,
-      imageUrl:
-        item.enclosure?.url ||
-        extractImageFromContent(item.content || item["content:encoded"] || ""),
+      imageUrl: extractImageUrl(item),
     }));
   } catch (err) {
     console.error(`[RSS] Failed to fetch ${source.name}:`, err);
@@ -40,8 +44,26 @@ async function fetchFeed(source: FeedSource): Promise<Article[]> {
   }
 }
 
-function extractImageFromContent(content: string): string | undefined {
-  const match = content.match(/<img[^>]+src="([^"]+)"/);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function extractImageUrl(item: any): string | undefined {
+  // 1. enclosure (France 24)
+  if (item.enclosure?.url) return item.enclosure.url;
+
+  // 2. media:content (Guardian, NYT, Gulf News)
+  if (item.mediaContent?.length) {
+    const url = item.mediaContent[0]?.$?.url;
+    if (url) return url;
+  }
+
+  // 3. media:thumbnail (BBC, France 24, Gulf News)
+  if (item.mediaThumbnail?.length) {
+    const url = item.mediaThumbnail[0]?.$?.url;
+    if (url) return url;
+  }
+
+  // 4. <img> tag in content (Times of Israel, Gulf News)
+  const content = item.content || item["content:encoded"] || "";
+  const match = content.match(/<img[^>]+src=["']([^"']+)["']/);
   return match?.[1];
 }
 
@@ -117,6 +139,40 @@ export async function fetchAllFeeds(): Promise<Article[]> {
     return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
   });
 
+  // Scrape og:image for articles missing images (Al Jazeera, NPR, etc.)
+  const missing = relevant.filter((a) => !a.imageUrl);
+  if (missing.length > 0) {
+    const ogResults = await Promise.allSettled(
+      missing.slice(0, 15).map((a) => scrapeOgImage(a.link))
+    );
+    ogResults.forEach((result, i) => {
+      if (result.status === "fulfilled" && result.value) {
+        missing[i].imageUrl = result.value;
+      }
+    });
+  }
+
   setCache(cacheKey, relevant);
   return relevant;
+}
+
+async function scrapeOgImage(url: string): Promise<string | undefined> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { "User-Agent": "MiddleEastNewsAggregator/1.0" },
+    });
+    clearTimeout(timeout);
+    const html = await res.text();
+    const match = html.match(
+      /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i
+    ) || html.match(
+      /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i
+    );
+    return match?.[1];
+  } catch {
+    return undefined;
+  }
 }
