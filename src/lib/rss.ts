@@ -204,31 +204,31 @@ const FALLBACK_PHOTOS = [
   "photo-1548199569-3e1c6aa8f469", // Middle East architecture
   "photo-1549877452-9c387954fbc2", // Aerial desert city
   "photo-1578895101408-1a36b834405b", // Tehran skyline
-  "photo-1558618666-fcd25c85f82e", // Mosque interior
+  "photo-1596394516093-501ba68a0ba6", // Mosque silhouette
   "photo-1590076215667-875d4ef2d7de", // Beirut
   "photo-1553522991-71439aa62779", // Desert road
   "photo-1580619305218-8423a7ef79b4", // Sand patterns
   "photo-1517483000871-1dbf64a6e1c6", // Sunset over city
-  "photo-1559827291-baf5c1bfe498", // Middle East market
-  "photo-1542556398-95fb5b9f9304", // Desert highway
-  "photo-1527503050827-1aef3199e189", // Cityscape night
+  "photo-1524492412937-b28074a5d7da", // Middle East street
+  "photo-1523978591478-c753949ff840", // Desert sunset
+  "photo-1499856871958-5b9627545d1a", // City night
   "photo-1569839333583-7375336cde4b", // Mosque dome aerial
   "photo-1586699253884-e199770f63b9", // Sand dunes sunset
-  "photo-1534854638093-3c6a22402775", // City buildings
+  "photo-1540959733332-eab4deabeeaf", // City aerial
   "photo-1573348722427-f1d6819fdf98", // Desert camp
   "photo-1504384308090-c894fdcc538d", // Tech/data center
   "photo-1541443131876-44b03de101c5", // Skyline dusk
   "photo-1526495124232-a04e1849168c", // Diplomacy/conference
   "photo-1495020689067-958852a7765e", // Newspaper/press
-  "photo-1585007600263-dce64869c13d", // Globe/geopolitics
-  "photo-1470075801209-17f9ec0each6", // Aerial coastal city
-  "photo-1544735716-392fe2489fbe", // Geometric patterns
+  "photo-1565008447742-97f6f38c985c", // Globe
+  "photo-1569863959165-56dae551d4fc", // Ancient ruins
+  "photo-1570168007204-dfb528c6958f", // Persian architecture
   "photo-1563207153-f403bf289096", // Minaret at sunset
   "photo-1548013146-72479768bada", // Taj cityscape
   "photo-1561361058-c24cecae35ca", // Oil refinery
   "photo-1518709779341-56cf4535e94b", // Military/defense
   "photo-1507003211169-0a1dd7228f2d", // Portrait/diplomacy
-  "photo-1504711434969-e33886168d1c", // News desk
+  "photo-1502920917128-1aa500764cbd", // Newspaper
   "photo-1557804506-669a67965ba0", // Boardroom
   "photo-1476231682828-37e571bc172f", // Sunset landscape
   "photo-1462332420958-a05d1e002413", // Night city lights
