@@ -16,13 +16,13 @@ export default function LiveIndicator({ interval = 300 }: { interval?: number })
   const seconds = countdown % 60;
 
   return (
-    <div className="flex items-center gap-2 text-xs font-mono tracking-wider uppercase">
-      <span className="relative flex h-2.5 w-2.5">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-strong opacity-75" />
-        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent-strong" />
+    <div className="flex items-center gap-2 text-[11px] font-mono tracking-wider uppercase">
+      <span className="relative flex h-2 w-2">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
       </span>
-      <span className="text-accent-strong">Live</span>
-      <span className="text-muted">
+      <span className="text-accent font-medium">Live</span>
+      <span className="text-muted tabular-nums">
         {minutes}:{seconds.toString().padStart(2, "0")}
       </span>
     </div>

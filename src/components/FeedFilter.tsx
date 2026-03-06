@@ -9,7 +9,7 @@ interface Props {
 }
 
 const filters: { value: FilterTier; label: string }[] = [
-  { value: "all", label: "All" },
+  { value: "all", label: "All Stories" },
   { value: 1, label: TIER_LABELS[1] },
   { value: 2, label: TIER_LABELS[2] },
   { value: 3, label: TIER_LABELS[3] },
@@ -18,18 +18,21 @@ const filters: { value: FilterTier; label: string }[] = [
 
 export default function FeedFilter({ active, onChange }: Props) {
   return (
-    <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-hide">
+    <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
       {filters.map((f) => (
         <button
           key={String(f.value)}
           onClick={() => onChange(f.value)}
-          className={`whitespace-nowrap px-3 py-1.5 text-xs font-mono uppercase tracking-wider rounded transition-all ${
+          className={`relative whitespace-nowrap px-4 py-2.5 text-xs font-mono uppercase tracking-wider transition-all ${
             active === f.value
-              ? "bg-accent-strong text-white"
-              : "bg-surface text-muted hover:text-foreground hover:bg-border"
+              ? "text-accent-strong font-medium"
+              : "text-muted hover:text-foreground"
           }`}
         >
           {f.label}
+          {active === f.value && (
+            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-accent rounded-full" />
+          )}
         </button>
       ))}
     </div>

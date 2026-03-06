@@ -6,7 +6,7 @@ interface Props {
   article: Article;
   language: Language;
   isTranslating?: boolean;
-  featured?: boolean;
+  variant?: "large" | "small";
   onDismiss?: (id: string) => void;
 }
 
@@ -25,7 +25,7 @@ export default function NewsCard({
   article,
   language,
   isTranslating,
-  featured,
+  variant = "small",
   onDismiss,
 }: Props) {
   const title =
@@ -35,48 +35,47 @@ export default function NewsCard({
       ? article.summaryJa
       : article.summary;
 
-  return (
-    <div
-      className={`group relative rounded-lg border transition-all duration-200 ${
-        featured
-          ? "border-accent/40 bg-gradient-to-br from-surface to-accent/10 p-5 hover:border-accent"
-          : "border-border bg-white/60 p-4 hover:bg-white hover:border-muted"
-      }`}
-    >
-      {/* Dismiss button */}
-      {onDismiss && (
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            onDismiss(article.id);
-          }}
-          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-border/60 text-muted hover:text-foreground"
-          title="Dismiss article"
-        >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          >
-            <path d="M3 3l8 8M11 3l-8 8" />
-          </svg>
-        </button>
-      )}
+  if (variant === "large") {
+    return (
+      <div className="card-large group relative rounded-xl overflow-hidden bg-surface border border-border hover:shadow-xl transition-all duration-300">
+        {/* Dismiss */}
+        {onDismiss && <DismissButton onDismiss={() => onDismiss(article.id)} />}
 
-      <a
-        href={article.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            {/* Source badge */}
-            <div className="flex items-center gap-2 mb-2">
+        <a
+          href={article.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block h-full"
+        >
+          {/* Image */}
+          {article.imageUrl ? (
+            <div className="relative w-full overflow-hidden" style={{ height: "280px" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={article.imageUrl}
+                alt=""
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+              <span className="absolute top-4 left-4 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest bg-accent text-white rounded-full">
+                {article.source.tierLabel}
+              </span>
+            </div>
+          ) : (
+            <div className="w-full bg-gradient-to-br from-surface-dark to-foreground/80 flex items-center justify-center" style={{ height: "280px" }}>
+              <span className="text-6xl font-display text-white/10" style={{ fontFamily: "var(--font-display), serif" }}>
+                MW
+              </span>
+              <span className="absolute top-4 left-4 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest bg-accent text-white rounded-full">
+                {article.source.tierLabel}
+              </span>
+            </div>
+          )}
+
+          {/* Content */}
+          <div className="p-6">
+            <div className="flex items-center gap-2 mb-3">
               <span
                 className="inline-block h-1.5 w-1.5 rounded-full"
                 style={{ backgroundColor: article.source.color }}
@@ -84,66 +83,133 @@ export default function NewsCard({
               <span className="text-[11px] font-mono uppercase tracking-wider text-muted">
                 {article.source.name}
               </span>
-              <span className="text-[10px] font-mono text-muted/70">
-                {article.source.tierLabel}
+              <span className="text-[10px] font-mono text-muted/60">
+                {timeAgo(article.pubDate)}
               </span>
             </div>
 
-            {/* Headline */}
             <h3
-              className={`font-semibold leading-snug group-hover:text-accent-strong transition-colors ${
-                featured
-                  ? "text-lg text-foreground"
-                  : "text-sm text-foreground/90"
-              } ${isTranslating ? "animate-pulse" : ""}`}
+              className={`font-display text-xl md:text-2xl font-bold leading-snug text-foreground group-hover:text-accent-strong transition-colors mb-3 ${
+                isTranslating ? "animate-pulse" : ""
+              }`}
+              style={{ fontFamily: "var(--font-display), 'Playfair Display', Georgia, serif" }}
             >
               {title}
             </h3>
 
-            {/* Summary */}
             {summary && (
               <p
-                className={`mt-1.5 text-foreground/50 leading-relaxed line-clamp-2 ${
-                  featured ? "text-sm" : "text-xs"
-                } ${isTranslating ? "animate-pulse" : ""}`}
+                className={`text-sm text-muted leading-relaxed line-clamp-3 ${
+                  isTranslating ? "animate-pulse" : ""
+                }`}
               >
                 {summary}
               </p>
             )}
+          </div>
+        </a>
+      </div>
+    );
+  }
 
-            {/* Meta */}
-            <div className="mt-3 flex items-center gap-3">
-              <span className="text-[10px] font-mono text-muted">
-                {timeAgo(article.pubDate)}
-              </span>
-              {featured && (
-                <span className="text-[10px] font-mono uppercase tracking-widest text-accent-strong border border-accent/40 px-1.5 py-0.5 rounded">
-                  Priority
-                </span>
-              )}
-            </div>
+  // Small card variant
+  return (
+    <div className="group relative rounded-xl overflow-hidden bg-surface border border-border hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+      {/* Dismiss */}
+      {onDismiss && <DismissButton onDismiss={() => onDismiss(article.id)} />}
+
+      <a
+        href={article.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block h-full"
+      >
+        {article.imageUrl ? (
+          <div className="relative w-full overflow-hidden" style={{ height: "160px" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={article.imageUrl}
+              alt=""
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent" />
+          </div>
+        ) : (
+          <div
+            className="w-full flex items-center justify-center"
+            style={{
+              height: "160px",
+              borderBottom: "3px solid var(--accent)",
+              background: "linear-gradient(135deg, var(--tag-bg) 0%, var(--background) 100%)",
+            }}
+          >
+            <span className="text-4xl font-display text-foreground/5" style={{ fontFamily: "var(--font-display), serif" }}>
+              MW
+            </span>
+          </div>
+        )}
+
+        <div className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <span
+              className="inline-block h-1.5 w-1.5 rounded-full"
+              style={{ backgroundColor: article.source.color }}
+            />
+            <span className="text-[10px] font-mono uppercase tracking-wider text-muted">
+              {article.source.name}
+            </span>
+            <span className="text-[9px] font-mono text-muted/60">
+              {timeAgo(article.pubDate)}
+            </span>
           </div>
 
-          {/* Thumbnail */}
-          {article.imageUrl && (
-            <div className="flex-shrink-0 hidden sm:block">
-              <div
-                className={`overflow-hidden rounded bg-surface ${
-                  featured ? "w-28 h-20" : "w-20 h-14"
-                }`}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={article.imageUrl}
-                  alt=""
-                  className="h-full w-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                  loading="lazy"
-                />
-              </div>
-            </div>
+          <h3
+            className={`font-display text-base font-semibold leading-snug text-foreground group-hover:text-accent-strong transition-colors line-clamp-3 ${
+              isTranslating ? "animate-pulse" : ""
+            }`}
+            style={{ fontFamily: "var(--font-display), 'Playfair Display', Georgia, serif" }}
+          >
+            {title}
+          </h3>
+
+          {summary && (
+            <p
+              className={`mt-2 text-xs text-muted leading-relaxed line-clamp-2 ${
+                isTranslating ? "animate-pulse" : ""
+              }`}
+            >
+              {summary}
+            </p>
           )}
         </div>
       </a>
     </div>
+  );
+}
+
+function DismissButton({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <button
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onDismiss();
+      }}
+      className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-full bg-black/40 backdrop-blur-sm text-white/80 hover:text-white hover:bg-black/60"
+      title="Dismiss article"
+    >
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 14 14"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      >
+        <path d="M3 3l8 8M11 3l-8 8" />
+      </svg>
+    </button>
   );
 }

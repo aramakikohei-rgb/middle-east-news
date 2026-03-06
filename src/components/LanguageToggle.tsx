@@ -9,12 +9,12 @@ interface Props {
 
 export default function LanguageToggle({ language, onChange }: Props) {
   return (
-    <div className="flex items-center border border-border rounded overflow-hidden text-xs font-mono">
+    <div className="flex items-center rounded-full border border-border overflow-hidden text-[11px] font-mono">
       <button
         onClick={() => onChange("en")}
-        className={`px-3 py-1.5 transition-colors ${
+        className={`px-3 py-1 transition-all ${
           language === "en"
-            ? "bg-accent-strong text-white"
+            ? "bg-accent text-white"
             : "bg-transparent text-muted hover:text-foreground"
         }`}
       >
@@ -22,9 +22,9 @@ export default function LanguageToggle({ language, onChange }: Props) {
       </button>
       <button
         onClick={() => onChange("ja")}
-        className={`px-3 py-1.5 transition-colors ${
+        className={`px-3 py-1 transition-all ${
           language === "ja"
-            ? "bg-accent-strong text-white"
+            ? "bg-accent text-white"
             : "bg-transparent text-muted hover:text-foreground"
         }`}
       >
