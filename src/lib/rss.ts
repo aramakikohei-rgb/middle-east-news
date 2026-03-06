@@ -44,20 +44,37 @@ async function fetchFeed(source: FeedSource): Promise<Article[]> {
   }
 }
 
+// Pick the media element with the largest width, falling back to the last entry
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function pickLargestMedia(mediaArray: any[]): string | undefined {
+  let bestUrl: string | undefined;
+  let bestWidth = 0;
+  for (const entry of mediaArray) {
+    const url = entry?.$?.url;
+    if (!url) continue;
+    const w = parseInt(entry.$.width, 10) || 0;
+    if (w >= bestWidth) {
+      bestWidth = w;
+      bestUrl = url;
+    }
+  }
+  return bestUrl;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractImageUrl(item: any): string | undefined {
   // 1. enclosure (France 24)
   if (item.enclosure?.url) return item.enclosure.url;
 
-  // 2. media:content (Guardian, NYT, Gulf News)
+  // 2. media:content — pick largest resolution (Guardian, NYT, Gulf News)
   if (item.mediaContent?.length) {
-    const url = item.mediaContent[0]?.$?.url;
+    const url = pickLargestMedia(item.mediaContent);
     if (url) return url;
   }
 
-  // 3. media:thumbnail (BBC, France 24, Gulf News)
+  // 3. media:thumbnail — pick largest resolution (BBC, France 24, Gulf News)
   if (item.mediaThumbnail?.length) {
-    const url = item.mediaThumbnail[0]?.$?.url;
+    const url = pickLargestMedia(item.mediaThumbnail);
     if (url) return url;
   }
 
