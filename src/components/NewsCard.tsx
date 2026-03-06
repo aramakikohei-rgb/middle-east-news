@@ -48,30 +48,19 @@ export default function NewsCard({
           className="block h-full"
         >
           {/* Image */}
-          {article.imageUrl ? (
-            <div className="relative w-full overflow-hidden" style={{ height: "280px" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={article.imageUrl}
-                alt=""
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-              <span className="absolute top-4 left-4 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest bg-accent text-white rounded-full">
-                {article.source.tierLabel}
-              </span>
-            </div>
-          ) : (
-            <div className="w-full bg-gradient-to-br from-surface-dark to-foreground/80 flex items-center justify-center" style={{ height: "280px" }}>
-              <span className="text-6xl font-display text-white/10" style={{ fontFamily: "var(--font-display), serif" }}>
-                MW
-              </span>
-              <span className="absolute top-4 left-4 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest bg-accent text-white rounded-full">
-                {article.source.tierLabel}
-              </span>
-            </div>
-          )}
+          <div className="relative w-full overflow-hidden" style={{ height: "280px" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={article.imageUrl}
+              alt=""
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            <span className="absolute top-4 left-4 px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest bg-accent text-white rounded-full">
+              {article.source.tierLabel}
+            </span>
+          </div>
 
           {/* Content */}
           <div className="p-6">
@@ -124,31 +113,16 @@ export default function NewsCard({
         rel="noopener noreferrer"
         className="block h-full"
       >
-        {article.imageUrl ? (
-          <div className="relative w-full overflow-hidden" style={{ height: "160px" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={article.imageUrl}
-              alt=""
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent" />
-          </div>
-        ) : (
-          <div
-            className="w-full flex items-center justify-center"
-            style={{
-              height: "160px",
-              borderBottom: "3px solid var(--accent)",
-              background: "linear-gradient(135deg, var(--tag-bg) 0%, var(--background) 100%)",
-            }}
-          >
-            <span className="text-4xl font-display text-foreground/5" style={{ fontFamily: "var(--font-display), serif" }}>
-              MW
-            </span>
-          </div>
-        )}
+        <div className="relative w-full overflow-hidden" style={{ height: "160px" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={article.imageUrl}
+            alt=""
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent" />
+        </div>
 
         <div className="p-4">
           <div className="flex items-center gap-2 mb-2">

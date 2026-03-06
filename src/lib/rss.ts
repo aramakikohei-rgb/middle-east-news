@@ -152,8 +152,65 @@ export async function fetchAllFeeds(): Promise<Article[]> {
     });
   }
 
+  // Filter out junk images (logos, tiny icons, SVGs) and assign Unsplash fallbacks
+  for (const article of relevant) {
+    if (!article.imageUrl || isJunkImage(article.imageUrl)) {
+      article.imageUrl = getFallbackImage(article.title);
+    }
+  }
+
   setCache(cacheKey, relevant);
   return relevant;
+}
+
+// Detect logos, icons, and other non-article images
+function isJunkImage(url: string): boolean {
+  const lower = url.toLowerCase();
+  return (
+    lower.includes("logo") ||
+    lower.includes("icon") ||
+    lower.includes("favicon") ||
+    lower.includes("badge") ||
+    lower.includes("avatar") ||
+    lower.endsWith(".svg") ||
+    lower.includes("google.com/images/branding") ||
+    lower.includes("gstatic.com") ||
+    lower.includes("/logos/") ||
+    // Google News thumbnail (low-quality, often just the publisher logo)
+    lower.includes("news.google.com")
+  );
+}
+
+// Curated Unsplash photos: Middle East cityscapes, architecture, landscapes, geopolitics
+const FALLBACK_PHOTOS = [
+  "photo-1512453979798-5ea266f8880c", // Dubai skyline
+  "photo-1518684079-3c830dcef090", // Dubai aerial
+  "photo-1564769625905-50e93615e769", // Abu Dhabi mosque
+  "photo-1547483238-f400e65ccd56", // Jerusalem old city
+  "photo-1509316785289-025f5b846b35", // Desert dunes
+  "photo-1466442929976-97f336a657be", // Middle East cityscape
+  "photo-1548199569-3e1c6aa8f469", // Middle East architecture
+  "photo-1549877452-9c387954fbc2", // Aerial desert city
+  "photo-1578895101408-1a36b834405b", // Tehran skyline
+  "photo-1558618666-fcd25c85f82e", // Mosque interior
+  "photo-1590076215667-875d4ef2d7de", // Beirut
+  "photo-1553522991-71439aa62779", // Desert road
+  "photo-1580619305218-8423a7ef79b4", // Sand patterns
+  "photo-1517483000871-1dbf64a6e1c6", // Sunset over city
+  "photo-1559827291-baf5c1bfe498", // Middle East market
+];
+
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+function getFallbackImage(title: string): string {
+  const index = hashString(title) % FALLBACK_PHOTOS.length;
+  return `https://images.unsplash.com/${FALLBACK_PHOTOS[index]}?w=800&h=500&fit=crop&auto=format&q=80`;
 }
 
 async function scrapeOgImage(url: string): Promise<string | undefined> {
