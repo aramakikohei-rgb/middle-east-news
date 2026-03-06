@@ -152,10 +152,20 @@ export async function fetchAllFeeds(): Promise<Article[]> {
     });
   }
 
-  // Filter out junk images (logos, tiny icons, SVGs) and assign Unsplash fallbacks
+  // Assign unique images: filter junk, deduplicate, fill gaps with Unsplash
+  const usedImages = new Set<string>();
+  let fallbackIndex = 0;
   for (const article of relevant) {
-    if (!article.imageUrl || isJunkImage(article.imageUrl)) {
-      article.imageUrl = getFallbackImage(article.title);
+    const url = article.imageUrl;
+    const needsFallback =
+      !url || isJunkImage(url) || usedImages.has(url);
+    if (needsFallback) {
+      const fallback = getNextFallbackImage(fallbackIndex, usedImages);
+      article.imageUrl = fallback;
+      usedImages.add(fallback);
+      fallbackIndex++;
+    } else {
+      usedImages.add(url);
     }
   }
 
@@ -200,19 +210,41 @@ const FALLBACK_PHOTOS = [
   "photo-1580619305218-8423a7ef79b4", // Sand patterns
   "photo-1517483000871-1dbf64a6e1c6", // Sunset over city
   "photo-1559827291-baf5c1bfe498", // Middle East market
+  "photo-1542556398-95fb5b9f9304", // Desert highway
+  "photo-1527503050827-1aef3199e189", // Cityscape night
+  "photo-1569839333583-7375336cde4b", // Mosque dome aerial
+  "photo-1586699253884-e199770f63b9", // Sand dunes sunset
+  "photo-1534854638093-3c6a22402775", // City buildings
+  "photo-1573348722427-f1d6819fdf98", // Desert camp
+  "photo-1504384308090-c894fdcc538d", // Tech/data center
+  "photo-1541443131876-44b03de101c5", // Skyline dusk
+  "photo-1526495124232-a04e1849168c", // Diplomacy/conference
+  "photo-1495020689067-958852a7765e", // Newspaper/press
+  "photo-1585007600263-dce64869c13d", // Globe/geopolitics
+  "photo-1470075801209-17f9ec0each6", // Aerial coastal city
+  "photo-1544735716-392fe2489fbe", // Geometric patterns
+  "photo-1563207153-f403bf289096", // Minaret at sunset
+  "photo-1548013146-72479768bada", // Taj cityscape
+  "photo-1561361058-c24cecae35ca", // Oil refinery
+  "photo-1518709779341-56cf4535e94b", // Military/defense
+  "photo-1507003211169-0a1dd7228f2d", // Portrait/diplomacy
+  "photo-1504711434969-e33886168d1c", // News desk
+  "photo-1557804506-669a67965ba0", // Boardroom
+  "photo-1476231682828-37e571bc172f", // Sunset landscape
+  "photo-1462332420958-a05d1e002413", // Night city lights
+  "photo-1519389950473-47ba0277781c", // Tech/screens
+  "photo-1488590528505-98d2b5aba04b", // Digital/tech
+  "photo-1551288049-bebda4e38f71", // Data dashboard
 ];
 
-function hashString(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+function getNextFallbackImage(index: number, usedImages: Set<string>): string {
+  for (let i = 0; i < FALLBACK_PHOTOS.length; i++) {
+    const photoIndex = (index + i) % FALLBACK_PHOTOS.length;
+    const url = `https://images.unsplash.com/${FALLBACK_PHOTOS[photoIndex]}?w=800&h=500&fit=crop&auto=format&q=80`;
+    if (!usedImages.has(url)) return url;
   }
-  return Math.abs(hash);
-}
-
-function getFallbackImage(title: string): string {
-  const index = hashString(title) % FALLBACK_PHOTOS.length;
-  return `https://images.unsplash.com/${FALLBACK_PHOTOS[index]}?w=800&h=500&fit=crop&auto=format&q=80`;
+  // All photos used — append unique suffix to avoid Set collision
+  return `https://images.unsplash.com/${FALLBACK_PHOTOS[index % FALLBACK_PHOTOS.length]}?w=800&h=500&fit=crop&auto=format&q=80&v=${index}`;
 }
 
 async function scrapeOgImage(url: string): Promise<string | undefined> {
